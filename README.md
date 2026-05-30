@@ -16,16 +16,8 @@ cd fakenews-bigdata
 - Đặt 2 file vào thư mục `tv1_data_engineer/`
 
 ### 3. Chạy môi trường
-# Tạo file hadoop.env
-cat > hadoop.env << 'EOF'
-CORE_CONF_fs_defaultFS=hdfs://namenode:9000
-CORE_CONF_hadoop_http_staticuser_user=root
-HDFS_CONF_dfs_replication=1
-EOF
-
 # Chạy docker compose
 docker compose up -d
-
 # Kiểm tra container
 docker ps
 
