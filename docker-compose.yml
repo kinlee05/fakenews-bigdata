@@ -1,58 +1,40 @@
-version: '3.8'
-
 services:
   namenode:
-    image: apache/hadoop:3.3.6
-    hostname: namenode
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     container_name: namenode
-    environment:
-      - HADOOP_HOME=/opt/hadoop
     ports:
-      - "9870:9870"
-      - "9000:9000"
-    command: ["hdfs", "namenode"]
+      - "9871:9870"
+      - "9001:9000"
+    environment:
+      - CLUSTER_NAME=fakenews
+    env_file:
+      - ./hadoop.env
     volumes:
-      - hadoop_namenode:/tmp/hadoop-root
+      - hadoop_namenode:/hadoop/dfs/name
 
   datanode:
-    image: apache/hadoop:3.3.6
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode
     environment:
-      - HADOOP_HOME=/opt/hadoop
-    command: ["hdfs", "datanode"]
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
     volumes:
-      - hadoop_datanode:/tmp/hadoop-root
+      - hadoop_datanode:/hadoop/dfs/data
     depends_on:
       - namenode
 
-  kafka:
-    image: apache/kafka:3.7.0
-    container_name: kafka
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
   spark-master:
-    image: bitnami/spark:3.5
+    image: apache/spark:3.5.0
     container_name: spark-master
-    environment:
-      - SPARK_MODE=master
     ports:
       - "8080:8080"
       - "7077:7077"
 
   spark-worker:
-    image: bitnami/spark:3.5
+    image: apache/spark:3.5.0
     container_name: spark-worker
     environment:
-      - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
     depends_on:
       - spark-master
