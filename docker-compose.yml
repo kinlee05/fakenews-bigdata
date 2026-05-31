@@ -23,10 +23,10 @@ services:
       - hadoop_datanode:/hadoop/dfs/data
     depends_on:
       - namenode
-
   spark-master:
     image: apache/spark:3.5.0
     container_name: spark-master
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
     ports:
       - "8080:8080"
       - "7077:7077"
@@ -34,11 +34,9 @@ services:
   spark-worker:
     image: apache/spark:3.5.0
     container_name: spark-worker
-    environment:
-      - SPARK_MASTER_URL=spark://spark-master:7077
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
     depends_on:
       - spark-master
-
 volumes:
   hadoop_namenode:
   hadoop_datanode:
