@@ -1,15 +1,11 @@
 import pandas as pd
 import json
 import time
-from kafka import KafkaProducer
+from confluent_kafka import Producer
 
-producer = KafkaProducer(
-    bootstrap_servers="localhost:9092",
-    value_serializer=lambda v: json.dumps(v).encode("utf-8")
-)
+producer = Producer({'bootstrap.servers': 'localhost:9092'})
 
-df = pd.read_csv("/home/hdoop/fakenews_project/final_data.csv")
-
+df = pd.read_csv("/home/hdoop/Documents/fakenews-bigdata/tv1_data_engineer/final_data.csv")
 print(f"Bắt đầu gửi {len(df)} bài lên Kafka...")
 
 for i, row in df.iterrows():
@@ -18,11 +14,12 @@ for i, row in df.iterrows():
         "content": str(row["content"]),
         "label": str(row["label"])
     }
-    producer.send("fakenews-topic", message)
-    
+    producer.produce("fakenews-topic", json.dumps(message).encode("utf-8"))
+
     if i % 1000 == 0:
+        producer.poll(0)
         print(f"Đã gửi {i}/{len(df)} bài")
-    
+
     time.sleep(0.01)
 
 producer.flush()
