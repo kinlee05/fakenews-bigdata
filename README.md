@@ -103,3 +103,35 @@ python3 train_model.py
 docker cp tv3_ml/saved_model namenode:/tmp/saved_model
 docker exec namenode hdfs dfs -mkdir -p /fakenews/models
 docker exec namenode hdfs dfs -put /tmp/saved_model /fakenews/models/
+
+9. Chạy TV4 - Web App
+
+**Yêu cầu:**
+- Model đã được train ở bước 8 (`tv3_ml/model.pkl`)
+
+**Cài thư viện:**
+```bash
+pip install fastapi uvicorn streamlit requests joblib --break-system-packages
+```
+
+**Terminal 1 - Chạy API:**
+```bash
+cd tv4_app/
+uvicorn api:app --host 0.0.0.0 --port 8000
+```
+
+**Terminal 2 - Chạy Web App:**
+```bash
+cd tv4_app/
+streamlit run app.py --server.port 8501
+```
+
+**Truy cập:** http://localhost:8501
+
+**Kiểm tra API:**
+```bash
+curl http://localhost:8000/health
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Aliens have landed in the USA"}'
+```
