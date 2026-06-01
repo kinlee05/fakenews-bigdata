@@ -96,7 +96,7 @@ pip install pyspark matplotlib pandas --break-system-packages
 cd tv3_ml/
 python3 train_model.py
 ### Kết quả sau khi chạy:
-- Bảng so sánh 3 mô hình in ra terminal
+- Bảng so sánh 3 mô hình in ra terminal.
 - Biểu đồ lưu tại `tv3_ml/model_comparison.png`
 - Model tốt nhất lưu tại `tv3_ml/saved_model/logistic_regression`
 ### Lưu model lên HDFS** (để TV4 sử dụng):
