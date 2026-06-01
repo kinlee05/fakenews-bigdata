@@ -81,3 +81,25 @@ bash/home/hdoop/spark/bin/spark-submit nlp_preprocessing.py
 bashdocker exec -it namenode hdfs dfs -ls /fakenews/processed/
 docker exec -it namenode hdfs dfs -ls /fakenews/nlp_features/
 docker exec -it namenode hdfs dfs -ls /fakenews/streaming_output/
+
+## 8. chạy mô hình machine learning (tv3)
+### yêu cầu 
+- Dataset đã được xử lý ở bước 4 (`final_data.csv`)
+- Java đã được cài đặt
+Cài Java nếu chưa có:sudo apt install default-jdk -y
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export PATH=JAVAHOME/bin:JAVA_HOME/bin:
+JAVAH​OME/bin:PATH
+Cài thư viện Python:
+pip install pyspark matplotlib pandas --break-system-packages
+### chạy train 3 mô hình 
+cd tv3_ml/
+python3 train_model.py
+### Kết quả sau khi chạy:
+- Bảng so sánh 3 mô hình in ra terminal
+- Biểu đồ lưu tại `tv3_ml/model_comparison.png`
+- Model tốt nhất lưu tại `tv3_ml/saved_model/logistic_regression`
+### Lưu model lên HDFS** (để TV4 sử dụng):
+docker cp tv3_ml/saved_model namenode:/tmp/saved_model
+docker exec namenode hdfs dfs -mkdir -p /fakenews/models
+docker exec namenode hdfs dfs -put /tmp/saved_model /fakenews/models/
