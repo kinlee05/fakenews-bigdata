@@ -104,7 +104,7 @@ docker cp tv3_ml/saved_model namenode:/tmp/saved_model
 docker exec namenode hdfs dfs -mkdir -p /fakenews/models
 docker exec namenode hdfs dfs -put /tmp/saved_model /fakenews/models/
 
-9. Chạy TV4 - Web App
+## 9. Chạy TV4 - Web App
 
 **Yêu cầu:**
 - Model đã được train ở bước 8 (`tv3_ml/model.pkl`)
