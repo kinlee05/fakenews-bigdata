@@ -106,32 +106,92 @@ docker exec namenode hdfs dfs -put /tmp/saved_model /fakenews/models/
 
 ## 9. Chạy TV4 - Web App
 
-**Yêu cầu:**
-- Model đã được train ở bước 8 (`tv3_ml/model.pkl`)
+### Yêu cầu
 
-**Cài thư viện:**
-```bash
-pip install fastapi uvicorn streamlit requests joblib --break-system-packages
+* Đã train model ở bước 8.
+* Thư mục model tồn tại:
+
+```text
+tv3_ml/saved_model/logistic_regression
 ```
 
-**Terminal 1 - Chạy API:**
+* Đã cài Java và Spark.
+
+### Cài thư viện
+
+```bash
+pip install fastapi uvicorn streamlit requests pyspark --break-system-packages
+```
+
+### Thiết lập môi trường Spark
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export SPARK_HOME=/home/hdoop/spark
+export PATH=$JAVA_HOME/bin:$SPARK_HOME/bin:$PATH
+```
+
+### Terminal 1 - Chạy API
+
 ```bash
 cd tv4_app/
+
 uvicorn api:app --host 0.0.0.0 --port 8000
 ```
 
-**Terminal 2 - Chạy Web App:**
+### Terminal 2 - Chạy Web App
+
 ```bash
 cd tv4_app/
+
 streamlit run app.py --server.port 8501
 ```
 
-**Truy cập:** http://localhost:8501
+### Truy cập Web
 
-**Kiểm tra API:**
+```text
+http://localhost:8501
+```
+
+### Kiểm tra API
+
 ```bash
 curl http://localhost:8000/health
+```
+
+Kết quả:
+
+```json
+{"status":"ok"}
+```
+
+### Test dự đoán
+
+```bash
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
-  -d '{"text": "Aliens have landed in the USA"}'
+  -d '{"text":"Reuters reported that oil prices rose after OPEC members agreed to reduce production."}'
 ```
+
+Ví dụ kết quả:
+
+```json
+{
+  "prediction": 0,
+  "label": "REAL",
+  "confidence": 0.99
+}
+```
+
+### Chức năng TV4
+
+* Giao diện Web bằng Streamlit.
+* Gửi nội dung bài báo đến API FastAPI.
+* Sử dụng mô hình Logistic Regression của TV3 để dự đoán.
+* Hiển thị:
+
+  * Kết quả REAL / FAKE.
+  * Độ tin cậy dự đoán.
+  * Lịch sử phân tích.
+  * Thống kê số lượng tin thật / giả.
+  * Biểu đồ trực quan.
