@@ -1,0 +1,79 @@
+```python
+import subprocess
+import requests
+
+print("=" * 40)
+print("   INTEGRATION TEST - FAKE NEWS PIPELINE")
+print("=" * 40)
+
+# Test 1: HDFS
+print("\n[1] Kiểm tra HDFS...")
+result = subprocess.run(
+    ["docker", "exec", "namenode", "hdfs", "dfs", "-ls", "/fakenews/raw/"],
+    capture_output=True,
+    text=True
+)
+
+if "final_data.csv" in result.stdout:
+    print("    ✅ HDFS: final_data.csv có trên HDFS")
+else:
+    print("    ❌ HDFS: Không tìm thấy final_data.csv")
+
+# Test 2: API Health Check
+print("\n[2] Kiểm tra API...")
+try:
+    r = requests.get(
+        "http://localhost:8001/health",
+        timeout=5
+    )
+
+    if r.status_code == 200 and r.json().get("status") == "ok":
+        print("    ✅ API: Server đang chạy")
+    else:
+        print(f"    ❌ API phản hồi bất thường: {r.text}")
+
+except Exception as e:
+    print(f"    ❌ API không kết nối được: {e}")
+
+# Test 3: Predict FAKE News
+print("\n[3] Kiểm tra dự đoán tin GIẢ...")
+try:
+    r = requests.post(
+        "http://localhost:8001/predict",
+        json={
+            "text": "SHOCKING: Politicians exposed in massive scandal deep state conspiracy revealed"
+        },
+        timeout=10
+    )
+
+    res = r.json()
+
+    print(f"    Kết quả: {res['label']} ({res['confidence']:.1%})")
+    print("    ✅ Predict FAKE: OK")
+
+except Exception as e:
+    print(f"    ❌ Predict FAKE thất bại: {e}")
+
+# Test 4: Predict REAL News
+print("\n[4] Kiểm tra dự đoán tin THẬT...")
+try:
+    r = requests.post(
+        "http://localhost:8001/predict",
+        json={
+            "text": "The Federal Reserve raised interest rates by 0.25 percent on Wednesday according to official statement"
+        },
+        timeout=10
+    )
+
+    res = r.json()
+
+    print(f"    Kết quả: {res['label']} ({res['confidence']:.1%})")
+    print("    ✅ Predict REAL: OK")
+
+except Exception as e:
+    print(f"    ❌ Predict REAL thất bại: {e}")
+
+print("\n" + "=" * 40)
+print("   INTEGRATION TEST HOÀN THÀNH")
+print("=" * 40)
+```
