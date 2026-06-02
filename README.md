@@ -116,6 +116,7 @@ tv3_ml/saved_model/logistic_regression
 ```
 
 * Đã cài Java và Spark.
+* API sử dụng mô hình Logistic Regression được huấn luyện bởi TV3.
 
 ### Cài thư viện
 
@@ -185,13 +186,36 @@ Ví dụ kết quả:
 
 ### Chức năng TV4
 
-* Giao diện Web bằng Streamlit.
-* Gửi nội dung bài báo đến API FastAPI.
-* Sử dụng mô hình Logistic Regression của TV3 để dự đoán.
+* Xây dựng REST API bằng FastAPI.
+* Endpoint `/health` kiểm tra trạng thái hệ thống.
+* Endpoint `/predict` nhận nội dung tin tức và trả về:
+  * Nhãn dự đoán (REAL / FAKE).
+  * Giá trị dự đoán của mô hình.
+  * Độ tin cậy (confidence score).
+* Tải và sử dụng mô hình Logistic Regression của TV3 để thực hiện suy luận (inference).
+* Xây dựng giao diện Web bằng Streamlit.
 * Hiển thị:
-
-  * Kết quả REAL / FAKE.
+  * Nội dung bài báo cần kiểm tra.
+  * Kết quả phân loại REAL / FAKE.
   * Độ tin cậy dự đoán.
-  * Lịch sử phân tích.
-  * Thống kê số lượng tin thật / giả.
-  * Biểu đồ trực quan.
+  * Lịch sử các lần phân tích.
+  * Thống kê số lượng tin thật / tin giả.
+  * Biểu đồ trực quan kết quả phân tích.
+
+### Kiến trúc TV4
+
+```text
+Người dùng
+     │
+     ▼
+ Streamlit Web App
+     │
+     ▼
+ FastAPI (/predict)
+     │
+     ▼
+ Logistic Regression Model
+     │
+     ▼
+ Kết quả REAL / FAKE
+```
